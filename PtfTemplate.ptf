@@ -84,7 +84,6 @@ Const
 //...
 //<pn>
 //...
-//<pn>
 //<addproc>
 //<initpart>
 Initialization
@@ -128,6 +127,7 @@ MEASBEGIN
   GND := pVEE;
   ComDCMPWR := DCM_To_VCC;
   ComDCMGND := DCM_To_VEE;
+  ConnPins := InPins;
 //<addconst>
 //<unconnectm>
   UnConnectAlll(0, 0);
@@ -141,14 +141,14 @@ MEASBEGIN
   DelayMS(TimeUSB);
 //<loadfilesm>
 //<contact>
-  contact(AllPins, -2.0, 10.0e-6, -1.8, -0.1);
-//<contact>
-//<pwrson>
-  setPower(PWR, Upwr_0, IlimPwr, Source_On);
   if VEEON = true then
     SetPower(GND, Ugnd_0, IlimPwr, Source_On);
   else
     SetPower(GND, Ugnd_0, IlimPwr, Source_Off);
+  contact(AllPins, -2.0, 10.0e-6, -1.8, -0.1);
+//<contact>
+//<pwrson>
+  setPower(PWR, Upwr_0, IlimPwr, Source_On);
 //<pwrson>
 //<funcspart>
 //<uo>
