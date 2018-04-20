@@ -1,0 +1,192 @@
+//<strconst>
+PROGRAM IMS5514BC1T1_08S;
+Const
+  Ver       : PChar = 'Версия ПП: 1.0';
+  Data      : PChar = 'Дата отладки: 17.11.17';
+  Raz       : PChar = 'Клюев К.И.';
+  TU        : PChar = 'АЕЯР.431260.179 ТУ коррекция 13';
+  Adap      : PChar   = 'Адаптер ФРМИ4.448.001(-01/-02/-03)';
+  KU        : PChar   = 'КУ ФРМИ4.448.018-01';
+  Jumper    : PChar   = 'J1 в положение 1-2, J2, J3';
+  LastBoard : PChar   = 'Pin1';
+//<strconst>
+//<filenames>
+  FileName  : string  = '5514БЦ1Т1-08_ТУ';
+//<filenames>
+//<realconst>
+  NumOfPin   = 14;
+  ILimPwr    = 0.1;
+  TimeMeasU  = 20;
+  TimeMeasI  = 50;
+  ActiveSVPN : integer = 1;
+//<realconst>
+//<tins>
+  Tin = 10.0;
+//<tins>
+//<boolconst>
+  VEEON  : boolean = false;
+  Adap60 : boolean = false;
+  RepinN : boolean = false;
+//<boolconst>
+//<types>
+Type
+  TNamePin = Array[1..NumOfPin] of string;
+  TVectors = Array[1..NumOfPin] of integer;
+//<types>
+//<debugpart>
+Const
+  (*)
+  DEBUG : boolean = true;
+  (*)
+  DEBUG : boolean = false;
+  (**)
+//<debugpart>
+//<pinconfig>
+  {$I !Source\PinConfigAll.inc}
+//<pinconfig>
+//<pins>
+  A1            : TLargeSet = [Pin01];
+  B1            : TLargeSet = [Pin02];
+  Y1            : TLargeSet = [Pin03];
+  A2            : TLargeSet = [Pin04];
+  B2            : TLargeSet = [Pin05];
+  Y2            : TLargeSet = [Pin06];
+  Y3            : TLargeSet = [Pin08];
+  A3            : TLargeSet = [Pin09];
+  B3            : TLargeSet = [Pin10];
+  Y4            : TLargeSet = [Pin11];
+  A4            : TLargeSet = [Pin12];
+  B4            : TLargeSet = [Pin13];
+//<pins>
+//<ping>
+  InPins        : TLargeSet = [Pin01, Pin02, Pin04, Pin05, Pin09, Pin10, Pin12, Pin13];
+  OutPins       : TLargeSet = [Pin03, Pin06, Pin08, Pin11];
+//<ping>
+//<boards>
+  BoardList     : TLargeSet = [Board1];
+//<boards>
+//<pinnames>
+  NamePin       : TNamePin  = ( 'A1', 'B1', 'Y1', 'A2', 'B2', 'Y2', 'GND', 'Y3', 'A3', 'B3', 'Y4', 'A4', 'B4', 'VCC');
+//<pinnames>
+//<vectors>
+  VectorUOL     : TVectors  = ( $0000, $0000, $0001, $0000, $0000, $0001, $0000, $0001, $0000, $0000, $0001, $0000, $0000, $0000);
+  VectorUOH     : TVectors  = ( $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000);
+  VectorIIL     : TVectors  = ( $0001, $0001, $0000, $0001, $0001, $0000, $0000, $0000, $0001, $0001, $0000, $0001, $0001, $0000);
+  VectorIIH     : TVectors  = ( $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000);
+//<vectors>
+//<source>
+  {$I !Source\Testes_dll.inc}
+//<source>
+//<addproc>
+//<p1>
+//...
+//<p1>
+//...
+//<pn>
+//...
+//<pn>
+//<addproc>
+//<initpart>
+Initialization
+  PinChangeDll();
+  if DeviceNotReady = false then
+    begin
+//<allpins>
+      AllPins  := InPins + OutPins;
+      ConnPins := InPins;
+//<allpins>
+//<unconnecti>
+      UnConnectAlll(0, 0);
+//<unconnecti>
+//<loadfilesi>
+      LoadFKFile(FileName, false);
+      DelayMS(TimeUSB);
+      Time_to_FKRec(FileName, FileName);
+      DelayMS(TimeUSB);
+      ActivateFileFK(FileName, true);
+      DelayMS(TimeUSB);
+//<loadfilesi>
+      Initialise(FileName, Ver, Data, Raz, GetTesterNumber, IMSNumber);
+    end;
+//<transpi>
+  Transparant ('5514БЦ1Т1-08, КУ ФРМИ4.448.018-01');
+//<transpi>
+//<initpart>
+//<mainpart>
+MEASBEGIN
+//<transpm>
+  Transparant ('5514БЦ1Т1-08, КУ ФРМИ4.448.018-01');
+//<transpm>
+  StartMeasTime;
+  if DeviceNotReady then GoTo ProgrammBrake;
+  TestNumber := 0;
+  Header(FileName, IMSNumber, DEBUG);
+  ActivateSVPN(ActiveSVPN);
+  DelayMS(TimeUSB);
+//<addconst>
+  PWR := pVCC;
+  GND := pVEE;
+  ComDCMPWR := DCM_To_VCC;
+  ComDCMGND := DCM_To_VEE;
+//<addconst>
+//<unconnectm>
+  UnConnectAlll(0, 0);
+//<unconnectm>
+//<loadfilesm>
+  LoadFKFile(FileName, false);
+  DelayMS(TimeUSB);
+  Time_to_FKRec(FileName, FileName);
+  DelayMS(TimeUSB);
+  ActivateFileFK(FileName, true);
+  DelayMS(TimeUSB);
+//<loadfilesm>
+//<contact>
+  contact(AllPins, -2.0, 10.0e-6, -1.8, -0.1);
+//<contact>
+//<pwrson>
+  setPower(PWR, Upwr_0, IlimPwr, Source_On);
+  if VEEON = true then
+    SetPower(GND, Ugnd_0, IlimPwr, Source_On);
+  else
+    SetPower(GND, Ugnd_0, IlimPwr, Source_Off);
+//<pwrson>
+//<funcspart>
+//<uo>
+//WTFVar := UO(  MPins, Upwr, Ugnd,  DRL,  DRH, DRL1, DRH1,    IOut, Uout, LBound, UBound, StartFK,    StopFK,                     TestName,                                            mode);
+  WTFVar := UO(OutPins,  2.0,  0.0, 0.45,  1.6,  0.0,  0.0, 19.0e-6,  1.0,  -0.02,   0.10,   $0000, VectorUOL, '2.1.Напр.низ.ур.UOL,В?2.1 Выходное напряжение низкого уровня UOL, В', !0000);
+  WTFVar := UO(OutPins,  4.5,  0.0,  1.3, 3.25,  0.0,  0.0,  5.7e-3, 2.25,  -0.02,   0.26,   $0000, VectorUOL, '2.1.Напр.низ.ур.UOL,В?2.1 Выходное напряжение низкого уровня UOL, В', !0001);
+  WTFVar := UO(OutPins,  6.0,  0.0, 1.75,  4.3,  0.0,  0.0,  7.6e-3,  3.0,  -0.02,   0.26,   $0000, VectorUOL, '2.1.Напр.низ.ур.UOL,В?2.1 Выходное напряжение низкого уровня UOL, В', !0001);
+//WTFVar := UO(  MPins, Upwr, Ugnd,  DRL,  DRH, DRL1, DRH1,    IOut, Uout, LBound, UBound, StartFK,    StopFK,                     TestName,                                            mode);
+  WTFVar := UO(OutPins,  2.0,  0.0, 0.45,  1.6,  0.0,  0.0, 19.0e-6,  1.0,    1.9,    2.1,   $0000, VectorUOH, '2.1.Напр.выс.ур.UOH,В?2.1 Выходное напряжение высокого уровня UOH, В', !0001);
+  WTFVar := UO(OutPins,  4.5,  0.0,  1.3, 3.25,  0.0,  0.0,  5.7e-3, 2.25,   3.98,    4.6,   $0000, VectorUOH, '2.1.Напр.выс.ур.UOH,В?2.1 Выходное напряжение высокого уровня UOH, В', !0001);
+  WTFVar := UO(OutPins,  6.0,  0.0, 1.75,  4.3,  0.0,  0.0,  7.6e-3,  3.0,   5.48,    6.1,   $0000, VectorUOH, '2.1.Напр.выс.ур.UOH,В?2.1 Выходное напряжение высокого уровня UOH, В', !0001);
+//<uo>
+//<icc>
+  ICC_On;
+//ICC(Upwr, Ugnd, DRL, DRH, DRL1, DRH1,   LBound, UBound,   Dim, StartFK, StopFK,                                 TestName                                 )
+  ICC( 7.0,  0.0, 0.0, 7.0,  0.0,  0.0, -40.0e-9, 8.0e-6, micro,   $0000,  $0000, '3.1.Ток.потр.ICC,мкА?3.1. Ток потребления в статическом режиме ICC, мкА');
+  ICC( 7.0,  0.0, 0.0, 7.0,  0.0,  0.0, -40.0e-9, 8.0e-6, micro,   $0000,  $0001, '3.1.Ток.потр.ICC,мкА?3.1. Ток потребления в статическом режиме ICC, мкА');
+  ICC( 7.0,  0.0, 0.0, 7.0,  0.0,  0.0, -40.0e-9, 8.0e-6, micro,   $0000,  $0002, '3.1.Ток.потр.ICC,мкА?3.1. Ток потребления в статическом режиме ICC, мкА');
+  ICC( 7.0,  0.0, 0.0, 7.0,  0.0,  0.0, -40.0e-9, 8.0e-6, micro,   $0000,  $0003, '3.1.Ток.потр.ICC,мкА?3.1. Ток потребления в статическом режиме ICC, мкА');
+  ICC_Off;
+//<icc>
+//<ili>
+//WTFVar := ILI( MPins, Upwr, Ugnd, UDCM, DRL, DRH, DRL1, DRH1,   LBound,  UBound,   Dim, StartFK,    StopFK,                                 TestName                                   ,   mode);
+  WTFVar := ILI(InPins,  7.0,  0.0,  0.0, 0.0, 7.0,  0.0,  0.0,  -0.1e-6, 12.0e-9, micro,   $0000, VectorIIL, '4.1.Ток.ут.низ.ур.ILL,мкА?4.1 Ток утечки низкого уровня на входе ILL, мкА',  !0001);
+  WTFVar := ILI(InPins,  7.0,  0.0,  7.0, 0.0, 7.0,  0.0,  0.0, -12.0e-9,  0.1e-6, micro,   $0000, VectorIIH, '4.1.Ток.ут.выс.ур.ILH,мкА?4.1 Ток утечки высокого уровня на входе ILH, мкА', !0001);
+//<ili>
+//<funcspart>
+  ProgrammBrake:
+//<mainpart>
+//<finalpart>
+FINALIZATION
+//<iccoff>
+  ICC_off;
+//<iccoff>
+//<unconnectf>
+  UnConnectAlll(0, 0);
+//<unconnectf>
+  MeasTime := MeasTimeMks;
+  RaportPrint(MeasTime/1000000);
+END.
+//<finalpart>
